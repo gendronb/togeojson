@@ -54,7 +54,7 @@ var toGeoJSON = (function() {
         if (ele) { ll.push(parseFloat(nodeVal(ele))); }
         return {
             coordinates: ll,
-            time: time ? nodeVal(time) : null,
+            time: time ? Date.parse(nodeVal(time)) : null,
             heartRate: heartRate ? parseFloat(nodeVal(heartRate)) : null
         };
     }
@@ -116,7 +116,7 @@ var toGeoJSON = (function() {
                 if (elems.length === 0) elems = get(root, 'gx:coord');
                 for (var i = 0; i < elems.length; i++) coords.push(gxCoord(nodeVal(elems[i])));
                 var timeElems = get(root, 'when');
-                for (var i = 0; i < timeElems.length; i++) times.push(nodeVal(timeElems[i]));
+                for (var i = 0; i < timeElems.length; i++) times.push(Date.parse(nodeVal(timeElems[i])));
                 return {
                     coords: coords,
                     times: times
@@ -223,8 +223,14 @@ var toGeoJSON = (function() {
                     }
                 }
                 if (geomsAndTimes.coordTimes.length) {
-                    properties.coordTimes = (geomsAndTimes.coordTimes.length === 1) ?
+
+                    if (!properties.coordinateProperties) {
+                        properties.coordinateProperties = {};
+                    }
+
+                    properties.coordinateProperties.times = (geomsAndTimes.coordTimes.length === 1) ?
                         geomsAndTimes.coordTimes[0] : geomsAndTimes.coordTimes;
+
                 }
                 var feature = {
                     type: 'Feature',
@@ -291,8 +297,17 @@ var toGeoJSON = (function() {
                 }
                 if (track.length === 0) return;
                 var properties = getProperties(node);
-                if (times.length) properties.coordTimes = track.length === 1 ? times[0] : times;
-                if (heartRates.length) properties.heartRates = track.length === 1 ? heartRates[0] : heartRates;
+
+                if (times.length) {
+                    if (!properties.coordinateProperties) properties.coordinateProperties = {};
+                    properties.coordinateProperties.times = track.length === 1 ? times[0] : times;
+                }
+
+                if (heartRates.length) {
+                    if (!properties.coordinateProperties) properties.coordinateProperties = {};
+                    properties.coordinateProperties.heartRates = track.length === 1 ? heartRates[0] : heartRates;
+                }
+
                 return {
                     type: 'Feature',
                     properties: properties,
