@@ -305,7 +305,7 @@ var toGeoJSON = (function() {
 
                 if (heartRates.length) {
                     if (!properties.coordinateProperties) properties.coordinateProperties = {};
-                    properties.coordinateProperties.heartRates = track.length === 1 ? heartRates[0] : heartRates;
+                    properties.coordinateProperties.heart = track.length === 1 ? heartRates[0] : heartRates;
                 }
 
                 return {
